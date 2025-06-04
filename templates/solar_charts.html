@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cartas Solares</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar para navegación entre proyectos -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fa fa-cubes"></i> Mis Proyectos</h2>
+        <button id="btnAddProject" class="icon-button">
+          <i class="fas fa-home"></i>
+        </button>
+      </div>
+      <div id="projectsList" class="sidebar-content">
+        <!-- Proyectos se cargarán dinámicamente aquí -->
+      </div>
+    </aside>
+
+    <!-- USER MENU ----->
+    <div id="userArea" style="position:relative;display:inline-block">
+      <div id="userButton" class="user-button"></div>
+      <div id="userMenu" class="user-menu hidden">
+        <p id="userEmail"></p>
+        <button id="myProjectsBtn">Mis Proyectos</button>
+        <button id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <div class="container p-4">
+        <div class="project-header">
+          <h1 id="projectTitle">Cargando proyecto...</h1>
+          <div class="project-actions">
+            <button id="btnAddChart" class="icon-btn"><i class="fas fa-plus"></i> Añadir carta</button>
+            <button id="btnBackToProjects" class="icon-btn"><i class="fas fa-arrow-left"></i> Volver</button>
+          </div>
+        </div>
+
+        <div id="chartsGrid" class="charts-grid">
+          <!-- Cartas solares se cargarán dinámicamente aquí -->
+        </div>
+
+        <!-- Modal para crear nueva carta solar -->
+        <div id="newChartModal" class="modal">
+          <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Nueva Carta Solar</h2>
+            <form id="newChartForm">
+              <div class="form-group">
+                <label for="chartTitle">Título:</label>
+                <input type="text" id="chartTitle" required>
+              </div>
+              <div class="form-group">
+                <label for="chartDescription">Descripción:</label>
+                <textarea id="chartDescription" rows="3"></textarea>
+              </div>
+              <button type="submit" class="primary-btn">Crear Carta</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <input type="file" id="epwInput" accept=".epw" hidden>
+
+  <script>
+    const PROJECT_ID = "{{ project_id }}";
+    const PROJECT_NAME = "{{ project_name }}"
+
+    // Función para obtener y mostrar el nombre del proyecto
+    async function loadProjectName() {
+      try {
+        // Llamar al backend para obtener los datos del proyecto
+        const response = await fetch(`/api/projects/${PROJECT_ID}`);
+        const project = await response.json();
+
+        // Comprobar si encontramos el proyecto
+        if (project && project.name) {
+          // Si encontramos el proyecto y tiene nombre, usarlo
+          document.getElementById('projectTitle').textContent = project.name;
+          document.title = `Cartas Solares - ${project.name}`;
+        } else {
+          // Si no se encuentra el proyecto en la API, mostrar un mensaje por defecto
+          document.getElementById('projectTitle').textContent = "Proyecto no encontrado";
+          document.title = "Cartas Solares - Proyecto no encontrado";
+        }
+      } catch (error) {
+        console.error('Error al cargar los datos del proyecto:', error);
+        document.getElementById('projectTitle').textContent = "Error al cargar el proyecto";
+        document.title = "Cartas Solares - Error";
+      }
+    }
+
+    // Ejecutar la función al cargar la página
+    document.addEventListener('DOMContentLoaded', loadProjectName);
+  </script>
+
+  <script>
+    (async function () {
+      // 1. Obtener e-mail desde el servidor
+      let email = '';
+      try {
+        const r = await fetch('/api/me');
+        if (!r.ok) throw new Error('unauth');
+        ({ email } = await r.json());
+      } catch { /* sesión expirada */ location.href = 'login.html'; return; }
+
+      // 2. Inicial del avatar
+      const first = email && isNaN(+email[0]) ? email[0].toUpperCase() : '#';
+
+      // 3. Referencias DOM
+      const btn = document.getElementById('userButton');
+      const menu = document.getElementById('userMenu');
+      const emailP = document.getElementById('userEmail');
+      const proj = document.getElementById('myProjectsBtn');
+      const out = document.getElementById('logoutBtn');
+
+      // 4. Pintar
+      btn.textContent = first;
+      emailP.textContent = email;
+
+      // 5. Toggle
+      btn.addEventListener('click', e => {
+        menu.classList.toggle('hidden'); e.stopPropagation();
+      });
+      document.addEventListener('click', () => menu.classList.add('hidden'));
+
+      // 6. Navegación
+      proj.addEventListener('click', () => {
+        window.location.href = '/';
+      });
+      out.addEventListener('click', () => {
+        location.href = '/logout';
+      });
+    })();
+  </script>
+
+
+  <script src="{{ url_for('static', filename='js/solar_charts.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Carta Solar {{ chart.id }}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.css">
+</head>
+
+<body>
+    <!-- ───── MENÚ SUPERIOR ───── -->
+    <header class="top-bar">
+        <h1><i class="fas fa-sun"></i> Carta Solar</h1>
+    </header>
+
+    <!-- ───── CONTENEDOR PRINCIPAL ───── -->
+    <div class="main-flex">
+        <div class="left-pane">
+            <div id="osdContainer" class="viewer2d"></div>
+
+            <!-- Ventana flotante para el 3D y ShadeDiagram -->
+            <div id="plot3d" class="viewer3d-overlay"></div>
+            <div id="shadeDiagram" class="diagram viewer3d-overlay"></div>
+        </div>
+
+        <!-- ▸ RIGHT  (panel de control) -->
+        <aside class="right-pane">
+            <button onclick="history.back()" class="primary-btn">← Volver al proyecto</button>
+            <button id="saveBtn" class="primary-btn">Guardar cambios</button>
+            <button id="updateBtn" class="secondary-btn" disabled>
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+
+            <h2>Parámetros</h2>
+            <input type="text" id="chartTitle" value="{{ chart.title or '' }}" placeholder="Introduce un título…" />
+
+            <!-- Y para la descripción: -->
+            <textarea id="chartDesc" rows="3" placeholder="Añade descripción…">{{ chart.description or '' }}</textarea>
+
+            <label for="angleInput">Orientación&nbsp;(°)</label>
+            <input type="number" id="angleInput" min="0" max="359" value="0">
+
+            <label for="tempInput">T&nbsp;mín&nbsp;(°C)</label>
+            <input type="number" id="tempInput" value="0">
+
+            <p id="status" class="status"></p>
+
+            <!-- ─── NUEVO BLOQUE: Sombras de voladizos ─── -->
+            <hr class="divider">
+
+            <h2>Protección Solar</h2>
+
+            <!-- Checkbox Horizontal + su formulario -->
+            <div class="shade-block">
+                <label for="chkH">
+                    <input type="checkbox" id="chkH"> Horizontal
+                </label>
+                <div class="shade-form horizontal-form">
+                    <label>Longitud voladizo (m)
+                        <input type="number" id="hLength" min="0" step="0.01">
+                    </label>
+                    <label>Altura ventana (m)
+                        <input type="number" id="hHeight" min="0" step="0.01">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Checkbox Vertical + su formulario -->
+            <div class="shade-block">
+                <label for="chkV">
+                    <input type="checkbox" id="chkV"> Vertical
+                </label>
+                <div class="shade-form vertical-form">
+                    <label>Lado
+                        <select id="vSide">
+                            <option value="right">Derecha</option>
+                            <option value="left">Izquierda</option>
+                        </select>
+                    </label>
+                    <label>Longitud lama (m)
+                        <input type="number" id="vLength" min="0" step="0.01">
+                    </label>
+                    <label>Ancho ventana (m)
+                        <input type="number" id="vWidth" min="0" step="0.01">
+                    </label>
+                </div>
+            </div>
+            <p id="shadeAngle" class="status"></p>
+        </aside>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="{{ url_for('static', filename='js/PlotlyVol.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/solar_chart_edit.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+</body>
+
+</html>

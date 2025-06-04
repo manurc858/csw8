@@ -1,0 +1,158 @@
+/* login.css – sencillo, limpio, corporativo */
+body {
+    background: #f5f7fa;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-wrapper {
+    background: #fff;
+    padding: 2.5rem 3rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+    width: 340px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: 600;
+}
+
+input[type=email],
+input[type=password] {
+    width: 100%;
+    padding: .6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+button {
+    margin-top: 0.25rem;
+
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background: #0052cc;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.25s;
+}
+
+button:hover {
+    background: #0041a3;
+}
+
+.divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    color: #999;
+}
+
+.remember {
+    margin-top: 0.65rem;
+    margin-bottom: 1.30rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.remember label {
+    position: relative;
+    top: -8px;
+    margin-left: .3rem;
+    font-size: 0.9rem;
+}
+
+#toggle {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+#toggle a {
+    color: #0052cc;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+#toggle a:hover {
+    text-decoration: underline;
+}
+
+.google-btn {
+  background: #fff;
+  color: #444;
+  border: 1px solid #dadce0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.google-btn:hover {
+  background-color: #d61818;
+  color: white;
+  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2); 
+}
+
+.google-btn img.google-icon {
+  width: 18px;
+  height: auto;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* ---------- Cabecera App CSW ---------- */
+.app-header {
+  text-align: left;
+  margin: -10rem 15rem 2rem 4rem;
+  padding-left: 1rem;
+}
+
+.app-title {
+  font-size: 8rem;
+  font-weight: 900;
+  color: #003366; 
+  margin-bottom: 0.5rem;
+  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  letter-spacing: 1.2px;
+}
+
+.app-powered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.idom-logo {
+  height: 35px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+
+
+
+
+

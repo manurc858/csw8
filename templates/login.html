@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Acceso</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+    <header class="app-header">
+        <h1 class="app-title">CSW 8.2</h1>
+        <div class="app-powered">
+            <span>Powered by:</span>
+            <img src="{{ url_for('static', filename='img/logo-idom.png') }}" alt="IDOM" class="idom-logo">
+        </div>
+    </header>
+
+    <div class="login-wrapper">
+
+
+        <h2 id="form-title">Iniciar sesión</h2>
+
+        <!-- FORMULARIO (sirve para login y registro) -->
+        <form id="auth-form">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" required>
+
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" required>
+
+            <div id="remember-wrapper" class="remember">
+                <input type="checkbox" id="remember">
+                <label for="remember">Recordarme</label>
+            </div>
+
+            <button type="submit" id="submit-btn">Entrar</button>
+
+            <p id="toggle">
+                ¿No tienes cuenta?
+                <a href="#" id="switch-to-signup">Regístrate</a>
+            </p>
+        </form>
+
+        <div class="divider">o</div>
+
+        <button id="google-btn" class="google-btn">
+            <img src="{{ url_for('static', filename='img/google-icon.svg') }}" alt="Google" class="google-icon">
+            Inicia sesión con Google
+        </button>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+
+</html>

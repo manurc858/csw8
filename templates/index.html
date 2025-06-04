@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Proyectos Solares</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar para navegación entre proyectos -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fa fa-cubes"></i> Mis Proyectos</h2>
+        </button>
+      </div>
+      <div id="projectsList" class="sidebar-content">
+        <!-- Proyectos se cargarán dinámicamente aquí -->
+      </div>
+    </aside>
+
+    <!-- USER MENU ----->
+    <div id="userArea" style="position:relative;display:inline-block">
+      <div id="userButton" class="user-button"></div>
+      <div id="userMenu" class="user-menu hidden">
+        <p id="userEmail"></p>
+        <button id="myProjectsBtn">
+          <i class="fa fa-home" aria-hidden="true"></i>
+          Mis Proyectos</button>
+        <button id="logoutBtn">
+          <i class="fa fa-sign-out" aria-hidden="true"></i>
+          Cerrar sesión</button>
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <div class="container p-4">
+        <h1>Mis Proyectos Solares</h1>
+
+        <!-- Formulario tradicional para subir EPW (funciona sin JavaScript ) -->
+        <div class="classic-upload-form">
+          <h2>Crear nuevo proyecto</h2>
+          <form id="traditionalForm" action="/" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="projectName">Nombre del proyecto:</label>
+              <input type="text" name="projectName" id="projectName" required>
+            </div>
+            <div class="form-group">
+              <label for="epw">Archivo .epw:</label>
+              <input type="file" name="epw" id="epw" accept=".epw" required>
+            </div>
+            <button type="button" id="startProjectBtn" class="primary-btn">Guardar EPW y continuar</button>
+          </form>
+          {% with msgs = get_flashed_messages() %}
+          {% if msgs %}
+          <ul class="flash-messages">
+            {% for m in msgs %}<li>{{ m }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+          {% endwith %}
+        </div>
+
+        <div id="projectsGrid" class="projects-list">
+          <!-- Proyectos se cargarán dinámicamente aquí -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    /* ────────── Carga proyectos desde el backend SQL ────────── */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchProjects();               // primera carga
+    });
+
+    function fetchProjects() {
+      fetch('/api/projects')
+        .then(r => r.json())
+        .then(renderProjects)
+        .catch(err => console.error('❌ Error cargando proyectos', err));
+    }
+
+    function renderProjects(projects) {
+      const grid = document.getElementById('projectsGrid');
+      const side = document.getElementById('projectsList');
+      grid.innerHTML = side.innerHTML = '';
+
+      if (!projects.length) {
+        grid.innerHTML =
+          '<div class="empty-state"><p>No hay proyectos. Crea uno nuevo con el formulario.</p></div>';
+        return;
+      }
+
+      projects.forEach(p => {
+        /* ── Tarjeta principal ───────────────────────────────── */
+        const card = document.createElement('div');
+        card.className = 'project-list-item';
+        card.innerHTML = `
+      <div class="project-info">
+        <h3>${p.name}</h3>
+        <p>Cartas solares: ${p.charts.length}</p>
+      </div>
+      <div class="project-actions">
+        <button class="icon-btn open-project" data-id="${p.id}" data-name="${p.name}">
+          <i class="fas fa-folder-open"></i>
+        </button>
+        <button class="icon-btn delete-project" data-id="${p.id}" data-name="${p.name}">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>`;
+
+        card.addEventListener('click', () => {
+          sessionStorage.setItem('currentProjectName', p.name);
+          location.href = `/projects/${p.id}/solar-charts`;
+        });
+
+        grid.appendChild(card);
+
+        /* ── Sidebar ─────────────────────────────────────────── */
+        const node = document.createElement('div');
+        node.className = 'sidebar-item';
+        node.innerHTML = `
+      <span>${p.name}</span>
+      <button class="icon-button open-project" data-id="${p.id}" data-name="${p.name}">
+        <i class="fas fa-arrow-right"></i>
+      </button>`;
+
+
+        side.appendChild(node);
+      });
+
+      /* Delegación de eventos */
+      document.querySelectorAll('.open-project').forEach(btn => {
+        btn.onclick = e => {
+          const { id, name } = e.currentTarget.dataset;
+          sessionStorage.setItem('currentProjectName', name);
+          location.href = `/projects/${id}/solar-charts`;
+        };
+      });
+
+      document.querySelectorAll('.delete-project').forEach(btn => {
+        btn.onclick = e => {
+          const { id, name } = e.currentTarget.dataset;
+          if (confirm(`¿Eliminar el proyecto "${name}"?`)) deleteProject(id);
+        };
+      });
+    }
+
+    function deleteProject(id) {
+      fetch(`/projects/${id}`, { method: 'DELETE' })
+        .then(() => fetchProjects())          // recarga lista
+        .catch(err => {
+          console.error('❌ Error al borrar', err);
+          fetchProjects();                    // intentar refrescar igual
+        });
+    }
+  </script>>
+
+
+  <script>
+    /* ────────── Envío de formulario “Crear proyecto” ────────── */
+
+    document.getElementById('startProjectBtn')
+      .addEventListener('click', createNewProject);
+
+    function createNewProject() {
+      const form = document.getElementById('traditionalForm');
+      const projectName = document.getElementById('projectName').value.trim();
+      const epwFile = document.getElementById('epw').files[0];
+
+      if (!projectName || !epwFile) {
+        alert('Por favor completa todos los campos');
+        return;
+      }
+
+      /* 1. Genera ID local para consistencia de URLs */
+      const projectId = 'proj_' + Date.now();
+
+      /* 2. Campo oculto para que Flask reciba el ID */
+      const hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = 'projectId';
+      hidden.value = projectId;
+      form.appendChild(hidden);
+      form.submit();
+    }
+  </script>
+
+  <script>
+    (async function () {
+      // 1. Obtener e-mail desde el servidor
+      let email = '';
+      try {
+        const r = await fetch('/api/me');
+        if (!r.ok) throw new Error('unauth');
+        ({ email } = await r.json());
+      } catch { /* sesión expirada */ location.href = 'login.html'; return; }
+
+      // 2. Inicial del avatar
+      const first = email && isNaN(+email[0]) ? email[0].toUpperCase() : '#';
+
+      // 3. Referencias DOM
+      const btn = document.getElementById('userButton');
+      const menu = document.getElementById('userMenu');
+      const emailP = document.getElementById('userEmail');
+      const proj = document.getElementById('myProjectsBtn');
+      const out = document.getElementById('logoutBtn');
+
+      // 4. Pintar
+      btn.textContent = first;
+      emailP.textContent = email;
+
+      // 5. Toggle
+      btn.addEventListener('click', e => {
+        menu.classList.toggle('hidden'); e.stopPropagation();
+      });
+      document.addEventListener('click', () => menu.classList.add('hidden'));
+
+      // 6. Navegación
+      proj.addEventListener('click', () => {
+        window.location.href = '/';
+      });
+      out.addEventListener('click', () => {
+        location.href = '/logout';
+      });
+    })();
+  </script>
+
+</body>
+
+</html>
