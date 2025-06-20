@@ -19,7 +19,7 @@ from flask_login import LoginManager, login_required, current_user, logout_user
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 app.config.update(
-    SECRET_KEY="FQo0jC8Mm$X4T~e-.9V2Gg_aPZ",
+    SECRET_KEY="shhhhh",
     SQLALCHEMY_DATABASE_URI="sqlite:///mi_app.db",
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     GOOGLE_CLIENT_ID=os.getenv("GOOGLE_CLIENT_ID", "RELLENA_CLIENT_ID"),
