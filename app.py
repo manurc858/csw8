@@ -651,4 +651,9 @@ def projects_home():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+
+    def _open_browser():
+        webbrowser.open("http://localhost:5000")
+
+    threading.Timer(1.0, _open_browser).start()
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
